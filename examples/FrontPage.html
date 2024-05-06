@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Weather query</title>
+    </head>
+
+    <body>
+        <h1>Weather query</h1>
+        <div>Input state to query</div>
+        <form id=form method="GET">
+            <input
+                id ="state"
+                type="text"
+                name="state_field"/>
+            <input type="submit" value="OK"/>
+        </form>
+        &nbsp;
+        <table border="1" id="weather-table">
+            <caption>Weather Information</caption>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>State</th>
+                    <th>Avg Temperature</th>
+                    <th>Wind Speed</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Test State</td>
+                    <td>Test Temp</td>
+                    <td>Test Speed</td>
+                </tr>
+            </thead>
+        </table>
+    </body>
+
+    <script>
+        const form = document.getElementById("form");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault(); // This prevents the page re-direct
+
+            const formData = new FormData(form); // Converts form input data to a dictionary
+            const params = new URLSearchParams(formData).toString(); // Converts form data to a search query
+
+            console.log(params);
+
+            fetch('http://localhost:8080/query_database/?'+params, {
+                method: "GET",
+                
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => {
+                var table = document.getElementById("weather-table"); // Get the table and the first body tag
+
+                // Clear the table
+                for (var i = 0; i < table.rows.length; i++) { table.deleteRow(0); };
+
+                for (var i = 0; i < data.length; i++) {
+                    var dataRow = data[i];
+
+                    // Create new row (<tr>)
+                    const newRow = table.insertRow();
+                    
+                    // Create new columns (<td>)
+                    const idCell = newRow.insertCell();
+                    const stateCell = newRow.insertCell();
+                    const avgTempCell = newRow.insertCell();
+                    const windSpeedCell = newRow.insertCell();
+
+                    
+                    idCell.textContent = dataRow["id"];
+                    stateCell.textContent = dataRow["state"];
+                    avgTempCell.textContent = dataRow["avg_temperature"];
+                    windSpeedCell.textContent = dataRow["wind_speed"];
+                }
+
+                console.log('Form submitted successfully:', data);
+
+            }).catch(error => {
+                console.error('There was a problem with form submission:', error);
+            });
+        });
+    </script>
+</html>
