@@ -2,6 +2,16 @@ var fs = require("fs");
 var http = require("http");
 const path = require("path");
 var url = require("url");
+var mysql = require("mysql2");
+
+// Create database connection
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "mysqluser",
+    port: 3306,
+    database: "weather",
+});
+
 
 const PORT = 8080;
 
@@ -54,6 +64,10 @@ const responseDirectories = {
 
     // Send search result page
     "/search/" : function(req, res) {
+        const urlParsed = url.parse(req.url, true);
+        const query = urlParsed.query;
+
+        console.log(urlParsed);
         sendFile(res, "./src/frontend/search.html");
     },
 

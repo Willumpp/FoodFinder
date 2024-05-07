@@ -1,8 +1,11 @@
 .front-page {
-    background-color: darkgrey;
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+.page {
+    background-color: darkgrey;
 }
 
 #search-form {
