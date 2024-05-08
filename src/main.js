@@ -9,7 +9,7 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "mysqluser",
     port: 3306,
-    database: "weather",
+    database: "food_finder",
 });
 
 
@@ -42,7 +42,8 @@ function sendFile(res, filePath) {
     const contentType = "text/"+path.extname(filePath).replace(".", ""); // Parse the content type using file extension
     res.writeHead(200, {'Content-Type': contentType});
 
-    console.log(`Serving file: '${filePath}'`);
+    console.log(`    background-color: darkgrey;
+    Serving file: '${filePath}'`);
 
     // Note: readFile is asynchronous
     fs.readFile(filePath, function(err, data) {
@@ -55,6 +56,24 @@ function sendFile(res, filePath) {
 
 }
 
+function sendQuery(res, htmlQuery) {
+    res.writeHead(200, {'Content-Type':'application/json'});
+
+    let sqlQuery = "SELECT * FROM food;";
+    
+    if (htmlQuery["query"] != "" && Object.keys(htmlQuery).length > 0) {
+        sqlQuery = `SELECT * FROM food WHERE name='${htmlQuery["query"]}';`;
+    }
+    
+    console.log(`Querying with: '${sqlQuery}'`);
+    con.query(sqlQuery, function(err, result, fields) {
+        if (err) throw err;
+        
+        res.write(JSON.stringify(result));
+        res.end();
+    })
+}
+
 // Directory of actions to perform given the URL path
 const responseDirectories = {
     // Send front page if no directory
@@ -64,11 +83,15 @@ const responseDirectories = {
 
     // Send search result page
     "/search/" : function(req, res) {
+        sendFile(res, "./src/frontend/search.html");
+    },
+
+    // DB queries
+    "/db/" : function(req, res) {
         const urlParsed = url.parse(req.url, true);
         const query = urlParsed.query;
 
-        console.log(urlParsed);
-        sendFile(res, "./src/frontend/search.html");
+        sendQuery(res, query);
     },
 
     // Not found

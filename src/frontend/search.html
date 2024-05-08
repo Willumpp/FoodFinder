@@ -7,7 +7,7 @@
     <body class="second-page page">
         <h1 id="food-finder-heading">Food Finder</h1>
 
-        <table border="3">
+        <table border="3" id="food-table">
             <thead>
                 <td>id</td>
                 <td>Name</td>
@@ -22,4 +22,32 @@
             </tbody>
         </table>
     </body>
+
+    <script>
+
+        fetch("/db/"+window.location.search
+        ).then(function(response) {
+            return response.json(); // .json() returns another promise containing the json
+        }).then(function(responseJSON) {
+            console.log(responseJSON)
+
+            var table = document.getElementById("food-table");
+
+            for (let i = 0; i < responseJSON.length; i++) {
+                let data = responseJSON[i];
+
+                var row = table.insertRow();
+    
+                var idCell = row.insertCell();
+                var nameCell = row.insertCell();
+                var priceCell = row.insertCell();
+    
+                idCell.innerHTML = data["id"]
+                nameCell.innerHTML = data["name"];
+                priceCell.innerHTML = data["price"];
+            }
+        }).catch(function(error) {
+            throw error;
+        });
+    </script>
 </html>
