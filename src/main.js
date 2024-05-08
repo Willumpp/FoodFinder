@@ -10,6 +10,7 @@ var con = mysql.createConnection({
     user: "mysqluser",
     port: 3306,
     database: "food_finder",
+    multipleStatements: true,
 });
 
 
@@ -56,14 +57,40 @@ function sendFile(res, filePath) {
 
 }
 
+
 function sendQuery(res, htmlQuery) {
     res.writeHead(200, {'Content-Type':'application/json'});
 
-    let sqlQuery = "SELECT * FROM food;";
+    let htmlKeys = Object.keys(htmlQuery);
+
+    console.log(`Querying with: ${JSON.stringify(htmlQuery)}`);
     
-    if (htmlQuery["query"] != "" && Object.keys(htmlQuery).length > 0) {
-        sqlQuery = `SELECT * FROM food WHERE name='${htmlQuery["query"]}';`;
+    let sqlQuery = "";
+    for (let i = 0; i < htmlKeys.length; i++) {
+        let key = htmlKeys[i];
+
+
+        // Decide what to do with the query
+        switch (key) {
+            case "query":
+                if (htmlQuery["query"] instanceof Array) { 
+                    let whereStatement = "";
+                    htmlQuery["query"].forEach((food) => { whereStatement += `name='${food}' OR `;});
+                    whereStatement = whereStatement.substring(0, whereStatement.length - 4);
+
+                    console.log(whereStatement);
+                    sqlQuery += `SELECT * FROM food WHERE ${whereStatement};`;
+                } else {
+                    sqlQuery += `SELECT * FROM food WHERE name='${htmlQuery["query"]}';`;
+                }
+                break;
+        
+            default:
+                break;
+        }
     }
+
+    if (htmlKeys.length == 0) { sqlQuery = "SELECT * FROM food;"; }
     
     console.log(`Querying with: '${sqlQuery}'`);
     con.query(sqlQuery, function(err, result, fields) {
