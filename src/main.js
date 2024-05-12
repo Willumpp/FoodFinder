@@ -73,16 +73,29 @@ function sendQuery(res, htmlQuery) {
         // Decide what to do with the query
         switch (key) {
             case "query":
-                if (htmlQuery["query"] instanceof Array) { 
-                    let whereStatement = "";
-                    htmlQuery["query"].forEach((food) => { whereStatement += `name='${food}' OR `;});
-                    whereStatement = whereStatement.substring(0, whereStatement.length - 4);
+                let whereStatement = "";
+                let havingCount = 1;
 
-                    console.log(whereStatement);
-                    sqlQuery += `SELECT * FROM food WHERE ${whereStatement};`;
+                if (htmlQuery["query"] instanceof Array) {
+
+                    whereStatement = "c.category IN ("
+                    htmlQuery["query"].forEach((food) => { whereStatement += `'${food}', `;});
+                    whereStatement = whereStatement.substring(0, whereStatement.length - 2) + ")";
+                    havingCount = htmlQuery["query"].length;
+                    
+
                 } else {
-                    sqlQuery += `SELECT * FROM food WHERE name='${htmlQuery["query"]}';`;
+                    whereStatement = `c.category='${htmlQuery["query"]}'`;
                 }
+                
+                console.log(`Where statement: '${whereStatement}'`);
+                sqlQuery += `
+                    SELECT f.id, f.name, f.price FROM food f
+                    JOIN food_categories fc ON f.id=fc.food_id
+                    JOIN categories c ON fc.category_id=c.id
+                    WHERE ${whereStatement}
+                    GROUP BY f.id
+                    HAVING COUNT(DISTINCT c.category) = ${havingCount};`;
                 break;
         
             default:
