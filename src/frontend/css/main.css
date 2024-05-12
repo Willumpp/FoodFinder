@@ -9,8 +9,11 @@
 }
 
 #search-form {
+    height: 8em;
+}
+
+.centre1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 8em;
 }

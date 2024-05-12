@@ -7,6 +7,13 @@
     <body class="second-page page">
         <h1 id="food-finder-heading">Food Finder</h1>
 
+        <div id="search-form">
+            <form id="search-bar" action="/search/">
+                <input type="text" id="search-bar-input" name="query">
+                <input type="submit" value="Search">
+            </form>
+        </div>
+
         <table border="3" id="food-table">
             <thead>
                 <td>id</td>
@@ -14,11 +21,6 @@
                 <td>Price</td>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Pizza</td>
-                    <td>£10</td>
-                </tr>
             </tbody>
         </table>
     </body>

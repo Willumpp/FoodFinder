@@ -73,20 +73,29 @@ function sendQuery(res, htmlQuery) {
         // Decide what to do with the query
         switch (key) {
             case "query":
-                let whereStatement = "";
-                let havingCount = 1;
+                let query = "";
 
                 if (htmlQuery["query"] instanceof Array) {
-
-                    whereStatement = "c.category IN ("
-                    htmlQuery["query"].forEach((food) => { whereStatement += `'${food}', `;});
-                    whereStatement = whereStatement.substring(0, whereStatement.length - 2) + ")";
-                    havingCount = htmlQuery["query"].length;
-                    
-
-                } else {
-                    whereStatement = `c.category='${htmlQuery["query"]}'`;
+                    htmlQuery["query"].forEach((food) => { query += `${food} `});
+                    query = query.substring(0, query.length-1);
                 }
+                else {
+                    query = htmlQuery["query"];
+                }
+                console.log(`Query: '${query}'`);
+                query = query.split(/ +/);
+                console.log("Query: ", query);
+
+                // let query = htmlQuery["query"].split(" ");
+                let whereStatement = "";
+                
+                // Whithout having count, anything with 1 matching tag from WHERE clause is displayed
+                let havingCount = query.length; // Needed for filtering out all food items with insufficient number of matching tags
+
+                // Use WHERE <field> IN (item1, item2, ...) clause
+                whereStatement = "c.category IN ("
+                query.forEach((food) => { whereStatement += `'${food}', `;});
+                whereStatement = whereStatement.substring(0, whereStatement.length - 2) + ")";
                 
                 console.log(`Where statement: '${whereStatement}'`);
                 sqlQuery += `
@@ -95,7 +104,8 @@ function sendQuery(res, htmlQuery) {
                     JOIN categories c ON fc.category_id=c.id
                     WHERE ${whereStatement}
                     GROUP BY f.id
-                    HAVING COUNT(DISTINCT c.category) = ${havingCount};`;
+                    HAVING COUNT(DISTINCT c.category) = ${havingCount}
+                    ORDER BY f.price;`;
                 break;
         
             default:

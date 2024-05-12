@@ -31,7 +31,8 @@ function simplify(string) {
         if ((65 <= ascii && ascii <= 90) // Capitals
             || (97 <= ascii && ascii <= 122) // Lowercase
             || (48 <= ascii && ascii <= 57) // Numbers
-            || (32 == ascii)) // Spacebar
+            || (32 == ascii) // Spacebar
+            || string[i] == ".") 
         { out += string[i]; }
     }
 
