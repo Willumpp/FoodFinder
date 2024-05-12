@@ -99,9 +99,10 @@ function sendQuery(res, htmlQuery) {
                 
                 console.log(`Where statement: '${whereStatement}'`);
                 sqlQuery += `
-                    SELECT f.id, f.name, f.price FROM food f
+                    SELECT f.id, f.name, f.price, r.menu_link FROM food f
                     JOIN food_categories fc ON f.id=fc.food_id
                     JOIN categories c ON fc.category_id=c.id
+                    JOIN restaurants r ON f.restaurant_id=r.id
                     WHERE ${whereStatement}
                     GROUP BY f.id
                     HAVING COUNT(DISTINCT c.category) = ${havingCount}

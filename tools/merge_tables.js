@@ -27,12 +27,14 @@ function simplify(string) {
     string = `${string}`;
     for (let i = 0; i < string.length; i++) {
         let ascii = string.charCodeAt(i);
+        let blacklist = `()"',`
 
-        if ((65 <= ascii && ascii <= 90) // Capitals
-            || (97 <= ascii && ascii <= 122) // Lowercase
-            || (48 <= ascii && ascii <= 57) // Numbers
-            || (32 == ascii) // Spacebar
-            || string[i] == ".") 
+        // if ((65 <= ascii && ascii <= 90) // Capitals
+        //     || (97 <= ascii && ascii <= 122) // Lowercase
+        //     || (48 <= ascii && ascii <= 57) // Numbers
+        //     || (32 == ascii) // Spacebar
+        //     || string[i] == "." || string[i] == ":" || string[i] == "/") 
+        if (blacklist.includes(string[i]) == false)
         { out += string[i]; }
     }
 

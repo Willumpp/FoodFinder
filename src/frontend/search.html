@@ -19,6 +19,7 @@
                 <td>id</td>
                 <td>Name</td>
                 <td>Price</td>
+                <td>Menu Link</td>
             </thead>
             <tbody>
             </tbody>
@@ -43,10 +44,12 @@
                 var idCell = row.insertCell();
                 var nameCell = row.insertCell();
                 var priceCell = row.insertCell();
+                var menuCell = row.insertCell();
     
                 idCell.innerHTML = data["id"]
                 nameCell.innerHTML = data["name"];
                 priceCell.innerHTML = data["price"];
+                menuCell.innerHTML = `<a href=${data["menu_link"]}>Menu Link</a>`;
             }
         }).catch(function(error) {
             throw error;
