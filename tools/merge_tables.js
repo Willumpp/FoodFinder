@@ -41,105 +41,140 @@ function simplify(string) {
     return out;
 }
 
-// Merge categories
-var sql = `
-    SET FOREIGN_KEY_CHECKS = 0;
-    TRUNCATE TABLE restaurants;
-    TRUNCATE TABLE food;
-    TRUNCATE TABLE categories; 
-    TRUNCATE TABLE food_categories;
-    SET FOREIGN_KEY_CHECKS = 1;
-    INSERT INTO categories (id, category) VALUES `
-sqlite3Con.all("SELECT * FROM categories;", [], (err, rows) => {
-    if (err) throw err;
-    console.log(rows.length);
+function replaceNull(string) {
+    if (string == "") return null
+    else return string;
+}
 
-    let subquery = "";
-    for (var i = 0; i < rows.length; i++) {
-        let row = rows[i];
+function insertCategories() {
+    return new Promise((resolve, rej) => {
+        // Merge categories
+        var sql = `
+        SET FOREIGN_KEY_CHECKS = 0;
+        TRUNCATE TABLE restaurants;
+        TRUNCATE TABLE food;
+        TRUNCATE TABLE categories; 
+        TRUNCATE TABLE food_categories;
+        SET FOREIGN_KEY_CHECKS = 1;
+        INSERT INTO categories (id, category) VALUES ?`
 
-        let subquery = `(${row["category_id"]}, '${simplify(row["category_name"])}'),\n`
-        sql += subquery;
-    }
-    sql = sql.substring(0, sql.length-3);
-    sql += ");"
-    
-    con.query(sql, function(err, res, fields) {
-        if (err) throw (err);
-        console.log("Completed query");
+        sqlite3Con.all("SELECT * FROM categories;", [], (err, rows) => {
+            if (err) throw err;
+            console.log(rows.length);
 
+            values = []
+            for (var i = 0; i < rows.length; i++) {
+                let row = rows[i];
+                values.push([row["category_id"], `${row["category_name"]}`]);
+            }
+            
+            con.query(sql, [values], function(err, res, fields) {
+                if (err) throw (err);
+                console.log("Completed categories query");
+
+                return resolve(1);
+            });
+        });
+    })
+}
+
+function insertRestaurants() {
+    return new Promise((resolve, rej)=> {
         // Merge restaurants
-        var sql = `INSERT INTO restaurants (id, name, menu_link, rating, subtext) VALUES `
+        var sql = `INSERT INTO restaurants (id, name, menu_link, rating, subtext) VALUES ?`
         sqlite3Con.all("SELECT * FROM restaurants;", [], (err, rows) => {
             if (err) throw err;
             console.log(rows.length);
-        
-            let subquery = "";
+
+            values = []
             for (var i = 0; i < rows.length; i++) {
                 let row = rows[i];
-        
-                let subquery = `(${row["restaurant_id"]}, '${simplify(row["name"])}', '${simplify(row["menu_link"])}', ${simplify(row["rating"])}, '${simplify(row["subtext"])}'),\n`
-                sql += subquery;
+
+                values.push([
+                    replaceNull(row["restaurant_id"]), 
+                    replaceNull(row["name"]), 
+                    replaceNull(row["menu_link"]), 
+                    replaceNull(row["rating"]), 
+                    replaceNull(row["subtext"]),
+                ]);
             }
-            sql = sql.substring(0, sql.length-3);
-            sql += ");"
             
-            con.query(sql, function(err, res, fields) {
+            con.query(sql, [values], function(err, res, fields) {
                 if (err) throw (err);
-                console.log("Completed query");
+                console.log("Completed restaurant query");
 
-
-                // Merge food items
-                var sql = `INSERT INTO food (id, name, calories, price, description, image_file, restaurant_id) VALUES `
-                sqlite3Con.all("SELECT * FROM food_items;", [], (err, rows) => {
-                    if (err) throw err;
-                    console.log(rows.length);
-                
-                    let subquery = "";
-                    for (var i = 0; i < rows.length; i++) {
-                        let row = rows[i];
-                
-                        let subquery = `(${row["food_id"]}, '${simplify(row["name"])}', ${simplify(row["calories"])}, ${simplify(row["price"])}, '${simplify(row["description"])}', ${row["image_file"]}, ${row["restaurant_id"]}),\n`
-                        sql += subquery;
-                    }
-                    sql = sql.substring(0, sql.length-3);
-                    sql += ");"
-                    
-                    con.query(sql, function(err, res, fields) {
-                        if (err) throw (err);
-                        console.log("Completed query");
-
-                        // Merge food categories
-                        var sql = `INSERT INTO food_categories (food_id, category_id) VALUES `
-                        sqlite3Con.all("SELECT * FROM food_categories;", [], (err, rows) => {
-                            if (err) throw err;
-                            console.log(rows.length);
-                        
-                            let subquery = "";
-                            for (var i = 0; i < rows.length; i++) {
-                                let row = rows[i];
-                        
-                                let subquery = `(${row["food_id"]}, ${row["category_id"]}),\n`
-                                sql += subquery;
-                            }
-                            sql = sql.substring(0, sql.length-3);
-                            sql += ");"
-                            
-                            con.query(sql, function(err, res, fields) {
-                                sqlite3Con.close();
-                                
-                                if (err) throw (err);
-                                console.log("Completed query");
-                                
-                            });
-                        });
-                    });
-                });
+                return resolve(1);
             });
         });
     });
-});
+}
 
+function insertFood() {
+    return new Promise((resolve, rej) => {
+        // Merge food items
+        var sql = `INSERT INTO food (id, name, calories, price, description, image_file, restaurant_id) VALUES ?`
+        sqlite3Con.all("SELECT * FROM food_items;", [], (err, rows) => {
+            if (err) throw err;
+            console.log(rows.length);
 
+            values = []
+            for (var i = 0; i < rows.length; i++) {
+                let row = rows[i];
 
+                values.push([
+                    replaceNull(row["food_id"]), 
+                    replaceNull(row["name"]), 
+                    replaceNull(row["calories"]), 
+                    replaceNull(String(row["price"]).replace(",", "")), 
+                    replaceNull(row["description"]),
+                    replaceNull(row["image_file"]),
+                    replaceNull(row["restaurant_id"]),
+                ]);
+            }
+            
+            con.query(sql, [values], function(err, res, fields) {
+                if (err) throw (err);
+                console.log("Completed food query");
 
+                return resolve(1);
+            });
+        });
+    });
+}
+
+function insertFoodCategories() {
+    return new Promise((resolve, rej) => {
+        // Merge food categories
+        var sql = `INSERT INTO food_categories (food_id, category_id) VALUES ?`
+        sqlite3Con.all("SELECT * FROM food_categories;", [], (err, rows) => {
+            if (err) throw err;
+            console.log(rows.length);
+
+            values = []
+            for (var i = 0; i < rows.length; i++) {
+                let row = rows[i];
+
+                values.push([
+                    replaceNull(row["food_id"]), 
+                    replaceNull(row["category_id"]), 
+                ]);
+            }
+            
+            con.query(sql, [values], function(err, res, fields) {
+                if (err) throw (err);
+                console.log("Completed food categories query");
+
+                return resolve(1);
+            });
+        });
+    });
+}
+
+async function insertValues() {
+    await insertCategories();
+    await insertRestaurants();
+    await insertFood();
+    await insertFoodCategories();
+}
+
+insertValues();
