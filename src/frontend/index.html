@@ -2,16 +2,23 @@
 <html>
     <head>
         <title>Food Finder</title>
-        <link rel="stylesheet" href="./css/main.css">
+        <link rel="stylesheet" href="/css/main.css">
     </head>
-    <body class="front-page page">
-        <h1 id="food-finder-heading">Food Finder</h1>
 
-        <div id="search-form" class="centre1">
-            <form id="search-bar" action="/search/">
-                <input type="text" id="search-bar-input" name="query">
-                <input type="submit" value="Search">
-            </form>
+    <body class="front-page page">
+        <img id="front-page-img" src="img/bg.jpg"></div>
+
+        <div id="search-centre">
+            <div id="food-finder-heading">
+                <h1>Food Finder</h1>
+            </div>
+            
+            <div id="search-form" class="centre1">
+                <form id="search-bar" action="/search/" autocomplete="off">
+                    <input type="text" id="search-bar-input" name="query" autocomplete="false">
+                </form>
+            </div>
         </div>
     </body>
+
 </html>

@@ -2,18 +2,70 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+    margin-top: 5%;
+}
+
+#front-page-img {
+    z-index: -1;
+    position:absolute;
+    width: 100%;
+    height: 50vh;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+}
+
+#search-centre {
+    background-color: rgb(50, 30, 30);
+    border-color: rgb(50, 30, 30);
+    /* border-top: 100px; */
+    border-top-width: 50px;
+    border-style: solid;
+
+    width: 750px;
+    height: 500px;
+    margin:auto;
+    margin-top: 5%;
+    border-radius: 10px;
 }
 
 .page {
-    background-color: darkgrey;
+    background-color: rgb(100, 50, 50);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 1%;
 }
 
-#search-form {
-    height: 8em;
+#search-bar {
+    margin-bottom: 50px;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    background-color: black;
+    border-color: black;
+    outline: none;
+}
+
+input[type="text"] {
+    background-color: rgb(40, 20, 20);
+    border: 3px;
+    border-radius: 10px;
+
+    width: 75%;
+    height: 50px;
+    color: white;
+    font-size: 20px;
+    padding-left: 20px;
 }
 
 .centre1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#food-finder-heading {
+    font-size: 45px;
+    font-style: italic;
 }

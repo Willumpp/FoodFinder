@@ -76,11 +76,11 @@ function sendQuery(res, htmlQuery) {
                 let query = "";
 
                 if (htmlQuery["query"] instanceof Array) {
-                    htmlQuery["query"].forEach((food) => { query += `${food} `});
+                    htmlQuery["query"].forEach((food) => { query += `${food.toLowerCase()} `});
                     query = query.substring(0, query.length-1);
                 }
                 else {
-                    query = htmlQuery["query"];
+                    query = htmlQuery["query"].toLowerCase();
                 }
                 console.log(`Query: '${query}'`);
                 query = query.split(/ +/);
